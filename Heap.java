@@ -1425,6 +1425,117 @@ public class Heap {
         }
         return dp[word1.length()][word2.length()];
     }
+
+    public String minWindow(String s, String t) {
+        if (s == null || t.length() > s.length() || s.length() == 0) return "";
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (Character c : t.toCharArray()){
+            int temp = map.getOrDefault(c, 0) + 1;
+            map.put(c, temp);
+        }
+        int count = t.length(), begin = 0, end = 0, maxL = Integer.MAX_VALUE, head = 0;
+        while (end < s.length()){
+            if (map.containsKey(s.charAt(end))){
+                int temp = map.get(s.charAt(end)) - 1;
+                if (temp >= 0){
+                    count--;
+                }
+                map.put(s.charAt(end), temp);
+            }
+            while (count == 0){
+                if ((end - begin) < maxL){
+                    maxL = end - begin;
+                    head = begin;
+                }
+                if (map.containsKey(s.charAt(begin))){
+                    int temp = map.get(s.charAt(begin)) + 1;
+                    if (temp > 0){
+                        count++;
+                    }
+                    map.put(s.charAt(begin), temp);
+                }
+                begin++;
+            }
+            end++;
+        }
+        return maxL >= s.length() ? "" : s.substring(head, head + maxL);
+    }
+
+    public boolean isScramble(String s1, String s2) {
+        if (s1.length() != s2.length()) return false;
+        int len = s1.length();
+        boolean [][][] F = new boolean[len][len][len + 1];
+        for (int k = 1; k <= len; ++k)
+            for (int i = 0; i + k <= len; ++i)
+                for (int j = 0; j + k <= len; ++j)
+                    if (k == 1)
+                        F[i][j][k] = s1.charAt(i) == s2.charAt(j);
+                    else for (int q = 1; q < k && !F[i][j][k]; ++q) {
+                        F[i][j][k] = (F[i][j][q] && F[i + q][j + q][k - q]) || (F[i][j + k - q][q] && F[i + q][j][k - q]);
+                    }
+        return F[0][0][len];
+    }
+
+    //91
+    public int numDecodings(String s) {
+        if (s.length() == 0  || s == null) {
+            return 0;
+        }
+        int[] dp = new int[s.length()+1];
+        dp[0] = 1;
+        dp[1] = s.charAt(0) == '0' ? 0 : 1;
+        for (int i = 2; i < s.length(); i++){
+            int sing = Integer.valueOf(s.substring(i-1,i));
+            int doub = Integer.valueOf(s.substring(i-2,i));
+            if (1<=sing && sing<=9){
+                dp[i] += dp[i-1];
+            }
+            if (10 <= doub && doub <=26 ){
+                dp[i] += dp[i-2];
+            }
+        }
+        return dp[s.length()];
+    }
+    //93
+    public List<String> restoreIpAddresses(String s) {
+        List<String> result = new ArrayList<>();
+        int n = s.length();
+        for (int i = 1 ;i < n-2 &&  i < 4; i++){
+            for (int j = i+1;j < n-1 && j < i+4; j++){
+                for (int k = j + 1; k < n && k < j + 4 ; k++){
+                    String s1 = s.substring(0,i);
+                    String s2 = s.substring(i,j);
+                    String s3 = s.substring(j,k);
+                    String s4 = s.substring(k);
+                    if (restoreIpAddressesHelper(s1) && restoreIpAddressesHelper(s2) && restoreIpAddressesHelper(s3) && restoreIpAddressesHelper(s4)){
+                        result.add(s1+'.'+s2+'.'+s3+'.'+s4);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    public boolean restoreIpAddressesHelper(String s){
+        if (s == null || s.length() == 0 ||s.length() > 3|| (s.charAt(0) == '0' && s.length() >1) || Integer.parseInt(s) > 255){
+            return false;
+        }
+        return true;
+    }
+
+    // 97
+    public boolean isInterleave(String s1, String s2, String s3) {
+        char[] c1 = s1.toCharArray(), c2 = s2.toCharArray(), c3 = s3.toCharArray();
+        if (s1.length() + s2.length() != s3.length()) return false;
+        return isInterleaveDFS(c1, c2, c3, 0, 0 , 0 , new boolean[s1.length()][s2.length()]);
+    }
+    public boolean isInterleaveDFS(char[] c1, char[] c2, char[] c3, int i, int j, int k, boolean[][] invalid){
+        if (invalid[i][j]) return false;
+        if (k == c3.length) return true;
+        boolean valid = i < c1.length && c1[i] == c3[k] && isInterleaveDFS(c1, c2, c3, i+1, j, k+1, invalid) ||
+                j < c2.length && c2[j] == c3[k] && isInterleaveDFS(c1, c2, c3, i, j+1, k+1, invalid);
+        if (!valid) invalid[i][j]= true;
+        return valid;
+    }
     public static void main(String[] args) {
 //        int[] temp = new int[]{1,3,1,2,0,5};
         Heap solution = new Heap();
@@ -1528,6 +1639,8 @@ public class Heap {
         System.out.println(temp.length());
         String[] tempS = "Hello World".split("\s{1,100}");
         solution.multiply("123", "456");
+        System.out.println("ANC".substring(1));
+        solution.isScramble("great", "rgeat");
 //        System.out.println(99*99);
     }
 
