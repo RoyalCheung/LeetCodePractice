@@ -1536,6 +1536,178 @@ public class Heap {
         if (!valid) invalid[i][j]= true;
         return valid;
     }
+    //115
+    public int numDistinct(String s, String t) {
+        int[][] dp = new int[s.length()+1][t.length()+1];
+        for (int i = 0; i < s.length();i++){
+            dp[i][0] = 1;
+        }
+        for (int i = 0; i < s.length(); i++){
+            for (int j = 0; j < t.length(); j++){
+                if (s.charAt(i) == t.charAt(j)){
+                    dp[i+1][j+1] = dp[i][j] + dp[i][j+1];
+                }else{
+                    dp[i+1][j+1] = dp[i][j+1];
+                }
+            }
+        }
+        return dp[s.length()][t.length()];
+    }
+
+    //125
+    public boolean isPalindrome(String s) {
+        s = s.trim();
+        if (s.length() == 0) return true;
+        int left = 0, right = s.length()-1;
+        while (left < right){
+            char leftC = Character.toLowerCase(s.charAt(left));
+            char rightC = Character.toLowerCase(s.charAt(right));
+            if (!Character.isLetterOrDigit(leftC)){
+                left++;
+            }else if (!Character.isLetterOrDigit(rightC)){
+                right--;
+            }else if (leftC != rightC){
+                return false;
+            }else{
+                right--;
+                left++;
+            }
+        }
+        return true ;
+    }
+    //126
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+        List<List<String>> result = findLaddersBFS(beginWord, endWord, wordList);
+        return result;
+    }
+    public List<List<String>> findLaddersBFS(String start, String end, List<String> wordList){
+        List<String> checked = new ArrayList<>();
+        Queue<String> queue = new ArrayDeque<>();
+        queue.add(start);
+        Queue<List<String>> result = new ArrayDeque<>();
+        List<List<String>> endResult = new ArrayList<>();
+        result.add(Arrays.asList(start));
+        boolean findEnd = false;
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++){
+                List<String> temp  = result.remove();
+                String cur = queue.remove();
+                checked.add(cur);
+                List<String> neigh = findLaddersGetNeighbors(cur, wordList);
+                for (String neight : neigh){
+                    if (!checked.contains(neight)){
+                        queue.add(neight);
+                        List<String> tempp = new ArrayList<>(temp);
+                        tempp.add(neight);
+                        result.add(tempp);
+                        if (neight.equals(end)){
+                            findEnd = true;
+                            endResult.add(tempp);
+                        }
+                    }
+                }
+            }
+            if (findEnd){
+                break;
+            }
+        }
+        return endResult;
+    }
+    public List<String> findLaddersGetNeighbors(String node, List<String> wordList){
+        List<String> result = new ArrayList<>();
+        for (String n : wordList){
+            int sum = 0;
+            for (int i = 0; i < node.length(); i++){
+                if (node.charAt(i) != n.charAt(i)){
+                    sum++;
+                }
+            }
+            if (sum == 1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
+    //127
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        if (!wordList.contains(endWord)) return 0;
+        HashSet<String> unchecked = new HashSet<>(wordList);
+        Queue<String> queue = new ArrayDeque<>();
+        queue.add(beginWord);
+        boolean findEnd = false;
+        int result = 1;
+
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            result++;
+            for (int i = 0; i < size; i++){
+                String cur = queue.remove();
+                unchecked.remove(cur);
+                List<String> neigh = ladderLengthHelper(cur, unchecked);
+                for (String neight : neigh){
+                    if (unchecked.contains(neight)){
+                        queue.add(neight);
+                        if (neight.equals(endWord)){
+                            findEnd = true;
+                        }
+                    }
+                }
+            }
+            if (findEnd){
+                break;
+            }
+        }
+        return findEnd ? result : 0;
+    }
+    public List<String> ladderLengthHelper(String node, HashSet<String> unchecked) {
+        List<String> result = new ArrayList<>();
+        char chs[] = node.toCharArray();
+
+        for (char ch ='a'; ch <= 'z'; ch++) {
+            for (int i = 0; i < chs.length; i++) {
+                if (chs[i] == ch) continue;
+                char old_ch = chs[i];
+                chs[i] = ch;
+                if (unchecked.contains(String.valueOf(chs))) {
+                    result.add(String.valueOf(chs));
+                }
+                chs[i] = old_ch;
+            }
+
+        }
+        return result;
+    }
+    //131
+    public List<List<String>> partition(String s) {
+        List<List<String>> result = new ArrayList<>();
+        partitionBT(s, 0, new ArrayList<>(), result);
+        return result;
+    }
+    public void partitionBT(String s, int j, List<String> curL, List<List<String>> result){
+        if (j > s.length() -1){
+            result.add(new ArrayList<>(curL));
+            return;
+        }
+        int size = curL.size();
+        for (int i = 0; i < s.length() - j; i++){
+            if (partitionIsPalindrome(s, j, j+i)){
+                curL.add(s.substring(j, j+i+1));
+                partitionBT(s, j+i+1, curL, result);
+            }
+            while (curL.size() > size){
+                curL.remove(curL.size()-1);
+            }
+        }
+    }
+    public boolean partitionIsPalindrome(String s, int left , int right){
+        while ( left < right){
+            if (s.charAt(left++) != s.charAt(right--)){
+                return false;
+            }
+        }
+        return true;
+    }
     public static void main(String[] args) {
 //        int[] temp = new int[]{1,3,1,2,0,5};
         Heap solution = new Heap();
@@ -1633,14 +1805,20 @@ public class Heap {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        System.out.println('-'-'+');
-        System.out.println('2'-'0');
-        String temp = " ";
-        System.out.println(temp.length());
-        String[] tempS = "Hello World".split("\s{1,100}");
-        solution.multiply("123", "456");
-        System.out.println("ANC".substring(1));
-        solution.isScramble("great", "rgeat");
+//        System.out.println('-'-'+');
+//        System.out.println('2'-'0');
+//        String temp = " ";
+//        System.out.println(temp.length());
+//        String[] tempS = "Hello World".split("\s{1,100}");
+//        solution.multiply("123", "456");
+//        System.out.println("ANC".substring(1));
+//        solution.isScramble("great", "rgeat");
+        List<String> temp = Arrays.asList("hot","dot","dog","lot","log","cog");
+        String[] a = "TEMP".split("");
+        solution.partition("aabb");
+        solution.findLadders("hit", "cog", temp);
+
+
 //        System.out.println(99*99);
     }
 
