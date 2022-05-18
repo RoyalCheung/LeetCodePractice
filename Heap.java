@@ -1708,115 +1708,129 @@ public class Heap {
         }
         return true;
     }
-    public static void main(String[] args) {
-//        int[] temp = new int[]{1,3,1,2,0,5};
-        Heap solution = new Heap();
-//        solution.maxSlidingWindow(temp, 3);
-//        int[] temp = new int[]{-2147483648,-2147483648,2147483647,-2147483648,-2147483648,-2147483648,2147483647,2147483647,2147483647,2147483647,-2147483648,2147483647,-2147483648};
-//        solution.medianSlidingWindow(temp, 3);
-//        solution.findClosestElements(new int[]{1,2,3,4,5}, 4, 3);
-//        int i = solution.swimInWater(new int[][]{{0,2},{1,3}});
-//        System.out.println(i);
-//        System.out.println((double) -1/2);
-//        System.out.println(Math.round((double)-1/2));
-//        int[] i = solution.kthSmallestPrimeFraction(new int[]{1,2,3,5}, 3);
-//        solution.shortestSubarray(new int[]{-100000,-100000,-100000}, 1000);
-//        System.out.println(1/1.16943257);
-//        solution.reachableNodes(new int[][]{{0,1,10},{0,2,1},{1,2,2}}, 6, 3);
-//        Heap.DinnerPlates dinner = new Heap.DinnerPlates(2);
-//        dinner.push(472);
-//        dinner.push(106);
-//        dinner.push(497);
-//        dinner.push(498);
-//        dinner.push(73);
-//        dinner.push(115);
-//        dinner.push(437);
-//        dinner.push(461);
-//        dinner.popAtStack(3);
-//        dinner.popAtStack(3);
-//        dinner.popAtStack(1);
-//        dinner.popAtStack(3);
-//        dinner.popAtStack(0);
-//        dinner.popAtStack(2);
-//        dinner.popAtStack(2);
-//        dinner.popAtStack(1);
-//        dinner.popAtStack(1);
-//        dinner.popAtStack(3);
-//        dinner.pop();
-//        dinner.push(197);
-//        dinner.push(239);
-//        dinner.push(129);
-//        dinner.push(449);
-//        dinner.push(460);
-//        dinner.push(240);
-//        dinner.push(386);
-//        dinner.push(346);
-//        dinner.pop();
-        File myObj = new File("/Users/royalcheung/Library/CloudStorage/OneDrive-TheChineseUniversityofHongKong/cs61b/LeetCode/GraphProblems/testCase");
-        try {
-            StringBuilder sb = new StringBuilder();
-            Scanner myReader = new Scanner(myObj);
-            StringBuffer command = new StringBuffer(myReader.nextLine());
-            StringBuffer values = new StringBuffer(myReader.nextLine());
-            command.delete(0,1);
-            command.delete(command.length()-1,command.length());
-            String commandString = command.toString();
-            String[] commandArray = commandString.split(",");
-
-            values.delete(0,1);
-            values.delete(values.length()-1, values.length());
-            String valuesString = values.toString();
-            String[] valuesArray = valuesString.split(",");
-            for (int i = 0; i < valuesArray.length; i++){
-                StringBuffer temp = new StringBuffer(valuesArray[i]);
-                temp.delete(0,1);
-                temp.delete(temp.length()-1, temp.length());
-                valuesArray[i] = temp.toString();
-            }
-            assert valuesArray.length == commandArray.length;
-            Heap.DinnerPlates dinner = new DinnerPlates(Integer.valueOf(valuesArray[0]));
-//            System.out.println(valuesArray.length);
-            for (int i = 1; i < valuesArray.length; i++){
-                if (commandArray[i].equals("\"push\"")){
-//                    System.out.println("AAA");
-                    dinner.push(Integer.valueOf(valuesArray[i]));
-                }else if (commandArray[i].equals("\"pop\"")){
-//                    System.out.println("AAA");
-                    dinner.pop();
-                }else if (commandArray[i].equals("\"popAtStack\"")){
-                    dinner.popAtStack(Integer.valueOf(valuesArray[i]));
+    //132
+    public int minCut(String s) {
+        int n = s.length();
+        int[] cut = new int[n];
+        boolean[][] pal = new boolean[n][n];
+        for (int i = 0; i < n; i++){
+            int min = i;
+            for (int j = 0; j <= i; j++){
+                if (s.charAt(i) == s.charAt(j) && ((j+1 > i-1) || pal[j+1][i-1])){
+                    pal[j][i] = true;
+                    min = j == 0 ? 0 : Math.min(min, cut[j-1] + 1);
                 }
-//                break;
             }
-//            int i = 1;
-//            for (i = 1; i < valuesArray.length; i++){
-//                if (commandArray[i].equals("\"push\"")){
-////                    System.out.println("AAA");
-//                    dinner.push(Integer.valueOf(valuesArray[i]));
-//                }else{
-//                    break;
-//                }
-//            }
-//            System.out.println(dinner.pop());
-            System.out.println("");
-
-//            System.out.println(command.toString());
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            cut[i] = min;
         }
-//        System.out.println('-'-'+');
-//        System.out.println('2'-'0');
-//        String temp = " ";
-//        System.out.println(temp.length());
-//        String[] tempS = "Hello World".split("\s{1,100}");
-//        solution.multiply("123", "456");
-//        System.out.println("ANC".substring(1));
-//        solution.isScramble("great", "rgeat");
-        List<String> temp = Arrays.asList("hot","dot","dog","lot","log","cog");
-        String[] a = "TEMP".split("");
-        solution.partition("aabb");
-        solution.findLadders("hit", "cog", temp);
+        return cut[n-1];
+    }
+    //139
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] dp = new boolean[s.length()+1];
+        dp[0] = true;
+        for (int i = 0; i <= s.length(); i++){
+            for (int j = 0; j < i; j++){
+                if (dp[j] && wordDict.contains(s.substring(j, i))){
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp[s.length()];
+    }
+    //140
+    public List<String> wordBreak2(String s, List<String> wordDict) {
+        List<String> result = new ArrayList<>();
+        wordBreak2BT(s, 0, wordDict, result, new ArrayList<>());
+        return result;
+    }
+    public void wordBreak2BT(String s, int j, List<String> wordDict, List<String> result, List<String> midString){
+        if (j >= s.length()){
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < midString.size(); i++){
+                sb.append(midString.get(i));
+                sb.append(" ");
+            }
+            result.add(sb.toString().trim());
+            return;
+        }
+        int size = midString.size();
+        for (int i = 1; i <= s.length() - j; i++){
+            if (wordDict.contains(s.substring(j, j+i))){
+                midString.add(s.substring(j, j+i));
+                wordBreak2BT(s, j+i, wordDict, result, midString);
+            }
+            while (midString.size() > size){
+                midString.remove(midString.size()-1);
+            }
+        }
+    }
+    //151
+    public String reverseWords(String s) {
+        s = s.trim();
+        String[] temp = s.split("\s{1,100}");
+        StringBuilder sb = new StringBuilder();
+        for (int i = temp.length-1; i>=0; i--){
+            sb.append(temp[i]);
+            sb.append(" ");
+        }
+        return sb.toString().trim();
+    }
+    public int minCutBT(String s, int j, int cut, int[][] dp){
+        if (j == s.length()-1){
+            return cut;
+        }else if (j >= s.length()){
+            return cut-1;
+        }
+        int minSum = Integer.MAX_VALUE;
+        for (int i = 0; i < s.length() - j; i++){
+            if (dp[j][j+i] == 0){
+                dp[j][j+i] = partitionIsPalindrome(s, j, j+i) ? 1 : -1;
+            }
+            if (dp[j][j+i] == 1){
+                int temp = minCutBT(s, j+i+1, cut+1, dp);
+                minSum = Math.min(temp, minSum);
+            }
+        }
+        return minSum;
+    }
+    //165
+    public int compareVersion(String version1, String version2) {
+        List<String> version1C = Arrays.asList(version1.split("\\."));
+        List<String> version2C = Arrays.asList(version2.split("\\."));
+        version1C = new ArrayList<>(version1C);
+        version2C = new ArrayList<>(version2C);
+        while (version1C.size() != version2C.size()){
+            if (version1C.size() < version2C.size()){
+                version1C.add("0");
+            }else{
+                version2C.add("0");
+            }
+        }
+        int n = version1C.size();
+        for (int i = 0; i < n; i++){
+            int temp1 = Integer.valueOf(version1C.get(i));
+            int temp2 = Integer.valueOf(version2C.get(i));
+            if (temp1 > temp2){
+                return 1;
+            }else if (temp1 < temp2){
+                return -1;
+            }
+        }
+        return 0;
+    }
+    public static void main(String[] args) {
+        Heap solution = new Heap();
+        solution.minCut("leet");
+        System.out.println(Integer.valueOf("001"));
+        List<String> temp = Arrays.asList("1.01.01".split("\\."));
+        List tempp = new ArrayList(temp);
+        tempp.add("0");
+        System.out.println(temp);
+        solution.compareVersion("1.01.01", "1.001");
+
+
 
 
 //        System.out.println(99*99);
