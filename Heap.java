@@ -1,4 +1,5 @@
 import javax.security.auth.PrivateCredentialPermission;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -1820,6 +1821,107 @@ public class Heap {
         }
         return 0;
     }
+    //166
+    public String fractionToDecimal(int numerator, int denominator) {
+        if (numerator == 0) return "0";
+        StringBuilder sb = new StringBuilder();
+        Long num = Math.abs(Long.valueOf(numerator));
+        Long denom = Math.abs(Long.valueOf(denominator));
+        String sign = ((numerator>0) ^ (denominator>0)) ? "-" : "";
+        sb.append(sign);
+        sb.append(num/denom);
+        num = num % denom;
+        if (num == 0) return sb.toString();
+        sb.append('.');
+        HashMap<Long, Integer> map = new HashMap<>();
+        map.put(num, sb.length());
+        while (num != 0){
+            num *= 10;
+            long temp = num / denom;
+            sb.append(temp);
+            num %= denom;
+            if (map.containsKey(num)){
+                int index = map.get(num);
+                sb.insert(index, '(');
+                sb.append(')');
+                break;
+            }else{
+                map.put(num, sb.length());
+            }
+        }
+        return sb.toString();
+    }
+    //168
+    public String convertToTitle(int columnNumber) {
+        char[] c = new char[26];
+        int rest;
+        int num = columnNumber / 26;
+        StringBuilder sb = new StringBuilder();
+        while (num != 0){
+            rest = num % 26;
+            sb.insert(0,(char)('A' + rest - 1));
+            num = num /26;
+        }
+        return sb.toString();
+    }
+    //171
+    public int titleToNumber(String columnTitle) {
+        int sum = 0;
+        for (int i = columnTitle.length()-1; i>=0 ; i--){
+            int p = columnTitle.length()-1 - i;
+            char c = columnTitle.charAt(i);
+            sum += Math.pow(26, p)* (c - 'A' + 1);
+        }
+        return sum;
+    }
+    //179
+    public String largestNumber(int[] nums) {
+        StringBuilder sb = new StringBuilder();
+        String[] tempString = new String[nums.length];
+        for (int i = 0; i < nums.length; i++){
+            tempString[i] = String.valueOf(nums[i]);
+        }
+        Comparator<String> comp = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String s1 = o1 + o2;
+                String s2 = o2 + o1;
+                return s1.compareTo(s2);
+            }
+        };
+        Arrays.sort(tempString, comp);
+        if (tempString[0].equals("0")) return "0";
+        for (int i = 0; i < tempString.length; i++){
+            sb.append(tempString[i]);
+        }
+
+        return sb.toString();
+    }
+    //187
+    public List<String> findRepeatedDnaSequences(String s) {
+        List<String> result = new ArrayList<>();
+        HashSet<String> seen = new HashSet<>();
+        for (int i = 0; i + 9 < s.length();i++){
+            if (!seen.contains(s.substring(i, i+10))){
+                seen.add(s.substring(i,i+10));
+            }else if (!result.contains(s.substring(i,i+10))){
+                result.add(s.substring(i,i+10));
+            }
+        }
+        return result;
+    }
+    //205
+    public boolean isIsomorphic(String s, String t) {
+        int[] m1 = new int[256], m2 = new int[256];
+        for (int i = 0; i < s.length(); i++){
+            if (m1[s.charAt(i)] != m2[t.charAt(i)]){
+                return false;
+            }
+            m1[s.charAt(i)] = i + 1;
+            m2[t.charAt(i)] = i + 1;
+        }
+        return true;
+    }
     public static void main(String[] args) {
         Heap solution = new Heap();
         solution.minCut("leet");
@@ -1829,7 +1931,12 @@ public class Heap {
         tempp.add("0");
         System.out.println(temp);
         solution.compareVersion("1.01.01", "1.001");
-
+        StringBuilder sb = new StringBuilder();
+        sb.append((char) ('A' + 1));
+        System.out.println(sb.toString());
+        System.out.println(3/4);
+        System.out.println(702%26);
+        System.out.println((char) ('0' + 256));
 
 
 
