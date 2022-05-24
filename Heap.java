@@ -1922,23 +1922,133 @@ public class Heap {
         }
         return true;
     }
+    static class Trie {
+        private static class Node{
+            private boolean val;
+            private Node[] next = new Node[26];
+        }
+        private Node root;
+        public Trie() {
+            root = new Node();
+        }
+
+        public void insert(String word) {
+            root = insert(root, word, 0);
+        }
+        private Node insert(Node node, String word, int d){
+            if (node == null) node = new Node();
+            if (d == word.length()) {
+                node.val = true;
+                return node;
+            }
+            node.next[word.charAt(d) - 'a'] = insert(node.next[word.charAt(d) - 'a'], word, d+1);
+            return node;
+        }
+
+        public boolean search(String word) {
+            return search(root, word, 0);
+        }
+        private boolean search(Node node, String word, int d){
+            if (node == null) return false;
+            if (d == word.length()){
+                return node.val;
+            }
+            return search(node.next[word.charAt(d) - 'a'], word, d+1);
+        }
+
+        public boolean startsWith(String prefix) {
+            return startsWith(root, prefix, 0);
+        }
+        private boolean startsWith(Node node, String prefix, int d){
+            if (node == null) return false;
+            if (d == prefix.length()) return true;
+            return startsWith(node.next[prefix.charAt(d) - 'a'], prefix, d+1 );
+        }
+    }
+    class WordDictionary {
+        private class TreeNode{
+            private boolean val;
+            private TreeNode[] next = new TreeNode[26];
+        }
+        private TreeNode root;
+        public WordDictionary() {
+            root = new TreeNode();
+        }
+
+        public void addWord(String word) {
+            root = addWord(root, word, 0);
+        }
+        public TreeNode addWord(TreeNode node, String word, int d){
+            if (node == null) node = new TreeNode();
+            if (d == word.length()){
+                node.val = true;
+                return node;
+            }
+            node.next[word.charAt(d)-'a'] = addWord(node.next[word.charAt(d)-'a'], word, d+1);
+            return node;
+        }
+
+        public boolean search(String word) {
+            return search(root, word, 0);
+        }
+        public boolean search(TreeNode node, String word, int d){
+            if (node == null) return false;
+            if (d == word.length()){
+                return node.val;
+            }
+            if (word.charAt(d) == '.'){
+                for (TreeNode tempNode : node.next){
+                    boolean temp = search(tempNode, word, d+1);
+                    if (temp){
+                        return true;
+                    }
+                }
+                return false;
+            }else{
+                return search(node.next[word.charAt(d)-'a'], word, d+1);}
+        }
+    }
+    //212
+    public List<String> findWords(char[][] board, String[] words) {
+        List<String> result = new ArrayList<>();
+
+        return null;
+    }
+    public void findWordsBFS(char[][] board, String word, int i, int j){
+        int n = board.length;
+        boolean[][] checked = new boolean[n][n];
+        Queue<int[]> queue  = new ArrayDeque<>();
+        queue.add(new int[]{i, j});
+        while (!queue.isEmpty()){
+            int[] tempP = queue.remove();
+        }
+    }
+    public List<Integer[]> findWordsHelper(int[] positions){
+        List<Integer[]> result = new ArrayList<>();
+        result.add(new Integer[]{positions[0], positions[1]+1});
+        result.add(new Integer[]{positions[0], positions[1]-1});
+        result.add(new Integer[]{positions[0]-1, positions[1]});
+        result.add(new Integer[]{positions[0]+1, positions[1]});
+        return result;
+    }
     public static void main(String[] args) {
         Heap solution = new Heap();
-        solution.minCut("leet");
-        System.out.println(Integer.valueOf("001"));
-        List<String> temp = Arrays.asList("1.01.01".split("\\."));
-        List tempp = new ArrayList(temp);
-        tempp.add("0");
-        System.out.println(temp);
-        solution.compareVersion("1.01.01", "1.001");
-        StringBuilder sb = new StringBuilder();
-        sb.append((char) ('A' + 1));
-        System.out.println(sb.toString());
-        System.out.println(3/4);
-        System.out.println(702%26);
-        System.out.println((char) ('0' + 256));
-
-
+//        solution.minCut("leet");
+//        System.out.println(Integer.valueOf("001"));
+//        List<String> temp = Arrays.asList("1.01.01".split("\\."));
+//        List tempp = new ArrayList(temp);
+//        tempp.add("0");
+//        System.out.println(temp);
+//        solution.compareVersion("1.01.01", "1.001");
+//        StringBuilder sb = new StringBuilder();
+//        sb.append((char) ('A' + 1));
+//        System.out.println(sb.toString());
+//        System.out.println(3/4);
+//        System.out.println(702%26);
+//        System.out.println((char) ('0' + 256));
+        Heap.Trie trie = new Trie();
+        trie.insert("apple");
+        trie.search("apple");
 
 //        System.out.println(99*99);
     }
