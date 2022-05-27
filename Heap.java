@@ -1966,20 +1966,20 @@ public class Heap {
         }
     }
     class WordDictionary {
-        private class TreeNode{
+        private class Node{
             private boolean val;
-            private TreeNode[] next = new TreeNode[26];
+            private Node[] next = new Node[26];
         }
-        private TreeNode root;
+        private Node root;
         public WordDictionary() {
-            root = new TreeNode();
+            root = new Node();
         }
 
         public void addWord(String word) {
             root = addWord(root, word, 0);
         }
-        public TreeNode addWord(TreeNode node, String word, int d){
-            if (node == null) node = new TreeNode();
+        public Node addWord(Node node, String word, int d){
+            if (node == null) node = new Node();
             if (d == word.length()){
                 node.val = true;
                 return node;
@@ -1987,48 +1987,157 @@ public class Heap {
             node.next[word.charAt(d)-'a'] = addWord(node.next[word.charAt(d)-'a'], word, d+1);
             return node;
         }
-
         public boolean search(String word) {
             return search(root, word, 0);
         }
-        public boolean search(TreeNode node, String word, int d){
+        public boolean search(Node node, String word, int d){
             if (node == null) return false;
             if (d == word.length()){
                 return node.val;
             }
-            if (word.charAt(d) == '.'){
-                for (TreeNode tempNode : node.next){
-                    boolean temp = search(tempNode, word, d+1);
-                    if (temp){
+            char next = word.charAt(d);
+            for (int c = 0; c < 26; c++){
+                if (next == '.' || (next-'a') == c){
+                    if (search(node.next[c], word, d+1)){
                         return true;
                     }
                 }
-                return false;
-            }else{
-                return search(node.next[word.charAt(d)-'a'], word, d+1);}
+            }
+            return false;
         }
     }
     //212
     public List<String> findWords(char[][] board, String[] words) {
         List<String> result = new ArrayList<>();
-
-        return null;
+        findWordsNode root = new findWordsNode();
+        for (String word : words){
+            root = findWordsInsert(root, word, 0);
+        }
+        for (int i = 0; i < board.length; i++){
+            for (int j = 0; j < board[0].length; j++){
+                findWordsDFS(board, result, i, j, root);
+            }
+        }
+        return result;
     }
-    public void findWordsBFS(char[][] board, String word, int i, int j){
-        int n = board.length;
-        boolean[][] checked = new boolean[n][n];
-        Queue<int[]> queue  = new ArrayDeque<>();
-        queue.add(new int[]{i, j});
-        while (!queue.isEmpty()){
-            int[] tempP = queue.remove();
+    public void findWordsDFS(char[][] board, List<String> result, int i, int j, findWordsNode trie){
+        char c = board[i][j];
+        if (c == '$' || trie.next[c-'a'] == null) return;
+        trie = trie.next[c-'a'];
+        board[i][j] = '$';
+        if (trie.word != null && !result.contains(trie.word)){
+            result.add(trie.word);
+        }
+        if (i>0){
+            findWordsDFS(board, result, i-1, j, trie);
+        }
+        if (j>0){
+            findWordsDFS(board, result, i, j-1, trie);
+        }
+        if (i<board.length-1){
+            findWordsDFS(board, result, i+1, j, trie);
+        }
+        if (j< board[0].length-1){
+            findWordsDFS(board, result, i, j+1, trie);
+        }
+        board[i][j] = c;
+    }
+    public findWordsNode findWordsInsert(findWordsNode node, String key, int d){
+        if (node == null){
+            node = new findWordsNode();
+        }
+        if (d == key.length()){
+            node.word = key;
+            return node;
+        }
+        int c = key.charAt(d) - 'a';
+        node.next[c] = findWordsInsert(node.next[c], key, d+1);
+        return node;
+    }
+    private class findWordsNode{
+        private findWordsNode[] next;
+        private String word;
+        public findWordsNode(){
+            next = new findWordsNode[26];
         }
     }
-    public List<Integer[]> findWordsHelper(int[] positions){
-        List<Integer[]> result = new ArrayList<>();
-        result.add(new Integer[]{positions[0], positions[1]+1});
-        result.add(new Integer[]{positions[0], positions[1]-1});
-        result.add(new Integer[]{positions[0]-1, positions[1]});
-        result.add(new Integer[]{positions[0]+1, positions[1]});
+
+    //214
+    public String shortestPalindrome(String s) {
+        StringBuilder sb = new StringBuilder();
+        int j = 0;
+        for (int i = s.length() - 1; i >= 0; i--){
+            if (s.charAt(i) == s.charAt(j)){
+                j++;
+            }
+        }
+        if (j == s.length()) return s;
+        String suffix  = s.substring(j);
+        return new StringBuffer(suffix).reverse().toString() + shortestPalindrome(s.substring(0, j)) + suffix;
+    }
+    //224
+    public int calculate(String s) {
+        Stack<Integer> stack = new Stack<>();
+        int sign = 1;
+        int number = 0;
+        int result = 0;
+
+        for (int i = 0; i < s.length(); i++){
+            if (Character.isDigit(s.charAt(i))){
+                result -= (sign * number);
+                number = (number * 10) + (int) (s.charAt(i) - '0') ;
+                result += (sign * number);
+            }else if (s.charAt(i) == '+'){
+                sign = 1;
+                number = 0;
+            }else if (s.charAt(i) == '-'){
+                sign = -1;
+                number = 0;
+            }else if (s.charAt(i) == '('){
+                stack.push(result);
+                stack.push(sign);
+                result = 0;
+                sign = 1;
+            }else if (s.charAt(i) == ')'){
+                result *= stack.pop();
+                result += stack.pop();
+            }
+        }
+        return result;
+    }
+    //227
+    public int calculate2(String s) {
+        Stack<Integer> stack = new Stack<>();
+        int result = 0;
+        char sign = '+';
+        int number = 0;
+        for (int i = 0; i < s.length(); i++){
+            if (Character.isDigit(s.charAt(i))){
+                number = number * 10 + (int) (s.charAt(i) - '0');
+            }
+            if (s.charAt(i) == '+' || s.charAt(i) == '-' || s.charAt(i) == '/' || s.charAt(i) == '*' || i == (s.length()-1)){
+                if (sign == '+'){
+                    stack.push(number);
+                }else if (sign == '-'){
+                    stack.push(-number);
+                }else if (sign == '*'){
+                    stack.push(number*stack.pop());
+                }else if (sign == '/'){
+                    stack.push(stack.pop()/number);
+                }
+                sign = s.charAt(i);
+                number = 0;
+            }
+        }
+        for (int num : stack){
+            result += num;
+        }
+        return result;
+    }
+    // 241
+    public List<Integer> diffWaysToCompute(String expression) {
+        List<Integer> result = new ArrayList<>();
+
         return result;
     }
     public static void main(String[] args) {
@@ -2049,6 +2158,9 @@ public class Heap {
         Heap.Trie trie = new Trie();
         trie.insert("apple");
         trie.search("apple");
+        solution.findWords(new char[][]{{'a'}, {'b'}}, new String[]{"ba"});
+        solution.calculate("- (3 + (4 + 5))");
+        solution.calculate2("3+2*2");
 
 //        System.out.println(99*99);
     }
