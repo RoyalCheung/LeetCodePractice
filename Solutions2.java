@@ -976,11 +976,106 @@ public class Node {
         }
         return result;
     }
+    //241
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()){
+            return false;
+        }
+        int[] a = new int[26];
+        for (int i = 0; i < s.length(); i++){
+            a[s.charAt(i) - 'a']++;
+            a[t.charAt(i) - 'a']--;
+        }
+        for (int i = 0; i < a.length; i++){
+            if (a[i] != 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //273
+    public static String numberToWords(int num) {
+        if (num == 0) return "Zero";
+        StringBuilder sb = new StringBuilder();
+        int a = num % 1000;
+        sb.append(numberToWordsHelper(a));
+        int i = 0;
+        while (num / 1000 > 0){
+
+            num /= 1000;
+            int rest = num % 1000;
+            if (i == 0 && rest != 0){
+                sb.insert(0," Thousand ");
+                sb.insert(0, numberToWordsHelper(rest));}
+            else if (i == 1 && rest != 0){
+                sb.insert(0," Million ");
+                sb.insert(0, numberToWordsHelper(rest));}
+            else if (i == 2 && rest != 0){
+                sb.insert(0," Billion ");
+                sb.insert(0, numberToWordsHelper(rest));}
+            i++;
+        }
+
+        return sb.toString().strip();
+    }
+    public static String numberToWordsHelper(int num){
+        StringBuilder sb = new StringBuilder();
+        String[] aph = new String[100];
+        aph[1] = "One";
+        aph[2] = "Two";
+        aph[3] = "Three";
+        aph[4] = "Four";
+        aph[5] = "Five";
+        aph[6] = "Six";
+        aph[7] = "Seven";
+        aph[8] = "Eight";
+        aph[9] = "Nine";
+        aph[10] = "Ten";
+        aph[11] = "Eleven";
+        aph[12] = "Twelve";
+        aph[13] = "Thirteen";
+        aph[14] = "Fourteen";
+        aph[15] = "Fifteen";
+        aph[16] = "Sixteen";
+        aph[17] = "Seventeen";
+        aph[18] = "Eighteen";
+        aph[19] = "Nineteen";
+        aph[20] = "Twenty";
+        aph[30] = "Thirty";
+        aph[40] = "Forty";
+        aph[50] = "Fifty";
+        aph[60] = "Sixty";
+        aph[70] = "Seventy";
+        aph[80] = "Eighty";
+        aph[90] = "Ninety";
+        int hun = num / 100;
+        if (hun != 0){
+            sb.append(aph[hun] + " " + "Hundred");
+        }
+        int ten = num % 100;
+        if (ten != 0){
+            if (ten < 20){
+                sb.append(" " + aph[ten]);
+            }else{
+                int sig = ten % 10;
+                sb.append(" " + aph[ten-sig]);
+                if (sig != 0){
+                    sb.append(" " + aph[sig]);
+                }
+            }
+        }
+        return sb.toString().strip();
+    }
 
     public static void main(String[] args) {
         List<Integer> result = diffWaysToCompute("2*3-4*5");
         int a = 2;
         System.out.println(--a == 1);
+        System.out.println(Math.pow(2,31));
+        System.out.println(231/1000);
+        System.out.println(numberToWordsHelper(451));
+        System.out.println(numberToWords(1000000000));
         Solutions2 solutions2 = new Solutions2();
 //        int[][] aa = new int[4][2];
 //        aa[0] = new int[]{1,4};
